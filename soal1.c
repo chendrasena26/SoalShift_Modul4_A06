@@ -9,7 +9,7 @@
 #include <sys/time.h>
 
 static const char *lokasi = "/home/chendrasena26/";
-
+//hehe
 static int getattrhehe(const char *pet, struct stat *stbuf)
 {
 	char pethehe[1000];
