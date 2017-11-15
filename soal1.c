@@ -1,6 +1,7 @@
 #define FUSE_USE_VERSION 28
 #include <fuse.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -8,14 +9,14 @@
 #include <errno.h>
 #include <sys/time.h>
 
-static const char *lokasi = "/home/chendrasena26/Documents";
+static const char *dirpath = "/home/chendrasena26/Documents";
 
-static int getattrhehe(const char *pet, struct stat *stbuf)
+static int xmp_getattr(const char *path, struct stat *stbuf)
 {
-	char pethehe[1000];
-	sprintf(pethehe,"%s%s",lokasi,pet);
-	int res;
-	res = lstat(pethehe, stbuf);
+  int res;
+	char fpath[1000];
+	sprintf(fpath,"%s%s",dirpath,path);
+	res = lstat(fpath, stbuf);
 
 	if (res == -1)
 		return -errno;
@@ -23,16 +24,16 @@ static int getattrhehe(const char *pet, struct stat *stbuf)
 	return 0;
 }
 
-static int readdirhehe(const char *path, void *buf, fuse_fill_dir_t filler,
+static int xmp_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 		       off_t offset, struct fuse_file_info *fi)
 {
   char fpath[1000];
 	if(strcmp(path,"/") == 0)
 	{
-		path=lokasi;
+		path=dirpath;
 		sprintf(fpath,"%s",path);
 	}
-	else sprintf(fpath, "%s%s",lokasi,path);
+	else sprintf(fpath, "%s%s",dirpath,path);
 	int res = 0;
 
 	DIR *dp;
@@ -58,27 +59,26 @@ static int readdirhehe(const char *path, void *buf, fuse_fill_dir_t filler,
 	return 0;
 }
 
-static int readhehe(const char *path, char *buf, size_t size, off_t offset,
+static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
 		    struct fuse_file_info *fi)
 {
   char fpath[1000];
 	if(strcmp(path,"/") == 0)
 	{
-		path=lokasi;
+		path=dirpath;
 		sprintf(fpath,"%s",path);
 	}
-	else sprintf(fpath, "%s%s",lokasi,path);
-	if((strstr(path,".txt"))||(strstr(path,".doc"))||(strstr(path,".pdf")))
-    	{
-            system("zenity --error --text=\"Terjadi kesalahan! File berisi konten berbahaya.\"");
-        	char namaeks[500];
-        	sprintf(namaeks,"%s.ditandai",path);
-        	rename(path, namaeks);
-        	return 0;
-    	}
-
+	else sprintf(fpath, "%s%s",dirpath,path);
+	if(strstr(fpath,".txt")||strstr(fpath,".doc")||strstr(fpath,".pdf"))
+    {
+        system("zenity --error --text=\"Terjadi kesalahan! File berisi konten berbahaya.\"");
+       	char namaeks[500];
+       	sprintf(namaeks,"%s.ditandai",fpath);
+       	rename(fpath, namaeks);
+       	return 0;
+    }
 	int res = 0;
-    	int fd = 0 ;
+    int fd = 0 ;
 
 	(void) fi;
 	fd = open(fpath, O_RDONLY);
@@ -93,14 +93,14 @@ static int readhehe(const char *path, char *buf, size_t size, off_t offset,
 	return res;
 }
 
-static struct fuse_operations operhehe = {
-	.getattr	= getattrhehe,
-	.readdir	= readdirhehe,
-	.read		= readhehe,
+static struct fuse_operations xmp_oper = {
+	.getattr	= xmp_getattr,
+	.readdir	= xmp_readdir,
+	.read		= xmp_read,
 };
 
 int main(int argc, char *argv[])
 {
 	umask(0);
-	return fuse_main(argc, argv, &operhehe, NULL);
+	return fuse_main(argc, argv, &xmp_oper, NULL);
 }
