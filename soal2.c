@@ -75,6 +75,11 @@ static int xmp_read(const char *path, char *buf, size_t size, off_t offset,
        	char namaeks[500];
        	sprintf(namaeks,"%s.ditandai",fpath);
        	rename(fpath, namaeks);
+	char dirbaru[500]; char makedir[500];
+	sprintf(dirbaru,"%s/rahasia",dirpath);
+	sprintf(makedir,"mkdir %s",dirbaru);
+	system(makedir);
+	//sprintf(dirpindah,"chmod 000 %s/rahasia/%s,")
        	return 0;
     }
 	int res = 0;
