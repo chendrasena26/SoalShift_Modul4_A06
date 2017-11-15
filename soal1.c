@@ -8,8 +8,8 @@
 #include <errno.h>
 #include <sys/time.h>
 
-static const char *lokasi = "/home/chendrasena26/";
-//hehe
+static const char *lokasi = "/home/chendrasena26/Documents";
+
 static int getattrhehe(const char *pet, struct stat *stbuf)
 {
 	char pethehe[1000];
@@ -68,13 +68,18 @@ static int readhehe(const char *path, char *buf, size_t size, off_t offset,
 		sprintf(fpath,"%s",path);
 	}
 	else sprintf(fpath, "%s%s",lokasi,path);
+	if((strstr(path,".txt"))||(strstr(path,".doc"))||(strstr(path,".pdf")))
+    	{
+            system("zenity --error --text=\"Terjadi kesalahan! File berisi konten berbahaya.\"");
+        	char namaeks[500];
+        	sprintf(namaeks,"%s.ditandai",path);
+        	rename(path, namaeks);
+        	return 0;
+    	}
+
 	int res = 0;
-    int fd = 0 ;
+    	int fd = 0 ;
 
-    if((!strstr(path,".txt"))||(!strstr(path,".doc"))||(!strstr(path,".pdf")))
-    {
-
-    }
 	(void) fi;
 	fd = open(fpath, O_RDONLY);
 	if (fd == -1)
